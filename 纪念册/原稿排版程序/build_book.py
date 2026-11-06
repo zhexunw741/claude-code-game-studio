@@ -131,9 +131,10 @@ def p_dedication(pg, side, sizes):
     img_html = ''
     if pl:
         h, hmm = cropped(pl['img'], pl['crop'], pl['w'], sizes[pl['img']])
-        img_html = (f'<div class="plate" style="left:{x + (TB_W - pl["w"]) / 2:.2f}mm;top:16mm">{h}</div>'
-                    f'<div class="cap" style="left:{x}mm;width:{TB_W}mm;top:{16 + hmm + 4.2:.1f}mm;justify-content:center">'
-                    f'<span class="cap-tx">{E(pl["cap"])}</span></div>')
+        img_html = f'<div class="plate" style="left:{x + (TB_W - pl["w"]) / 2:.2f}mm;top:16mm">{h}</div>'
+        if pl.get('cap'):
+            img_html += (f'<div class="cap" style="left:{x}mm;width:{TB_W}mm;top:{16 + hmm + 4.2:.1f}mm;justify-content:center">'
+                         f'<span class="cap-tx">{E(pl["cap"])}</span></div>')
     lines = ''.join(f'<p class="ded">{E(p)}</p>' for p in pg['paragraphs'])
     return (img_html + f'<div class="tb" style="left:{x}mm;top:98mm">'
             f'<div class="ptitle center"><span class="tick"></span>{E(pg["title"])}</div>{lines}</div>' + folio(pg['page']))

@@ -1,0 +1,242 @@
+[
+ {
+  "page": 1,
+  "side": "右",
+  "layout": "cover",
+  "status": "书封：竖排书名 + 原创海天与鲸插画（氛围图，不代表真实经历）；原P01内容待核对"
+ },
+ {
+  "page": 2,
+  "side": "左",
+  "layout": "frontis",
+  "status": "扉页跨页提案：清晨的海横跨P02–P03；原稿内容待核对"
+ },
+ {
+  "page": 3,
+  "side": "右",
+  "layout": "title",
+  "status": "扉页提案：竖排书名；原稿内容待核对"
+ },
+ {
+  "page": 4,
+  "side": "左",
+  "layout": "chapter",
+  "status": "篇章页提案：圆窗随时间变化；若原稿不分章则改为正文或照片页"
+ },
+ {
+  "page": 5,
+  "side": "右",
+  "layout": "text_first",
+  "status": "篇章首页正文位：原稿未取得"
+ },
+ {
+  "page": 6,
+  "side": "左",
+  "layout": "illus",
+  "status": "P06左/P07右同一幅连续跨页插画位：原插画未取得，不以新图代替"
+ },
+ {
+  "page": 7,
+  "side": "右",
+  "layout": "illus",
+  "status": "P06左/P07右同一幅连续跨页插画位：原插画未取得，不以新图代替"
+ },
+ {
+  "page": 8,
+  "side": "左",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 9,
+  "side": "右",
+  "layout": "plate",
+  "status": "单幅照片位：原图未取得"
+ },
+ {
+  "page": 10,
+  "side": "左",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 11,
+  "side": "右",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 12,
+  "side": "左",
+  "layout": "mixed",
+  "status": "照片 + 正文位：原图与原稿未取得"
+ },
+ {
+  "page": 13,
+  "side": "右",
+  "layout": "pair",
+  "status": "双图位：原图未取得"
+ },
+ {
+  "page": 14,
+  "side": "左",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 15,
+  "side": "右",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 16,
+  "side": "左",
+  "layout": "fullbleed",
+  "status": "满版出血照片位：原图未取得"
+ },
+ {
+  "page": 17,
+  "side": "右",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 18,
+  "side": "左",
+  "layout": "chapter",
+  "status": "篇章页提案：圆窗随时间变化；若原稿不分章则改为正文或照片页"
+ },
+ {
+  "page": 19,
+  "side": "右",
+  "layout": "text_first",
+  "status": "篇章首页正文位：原稿未取得"
+ },
+ {
+  "page": 20,
+  "side": "左",
+  "layout": "plate",
+  "status": "单幅照片位：原图未取得"
+ },
+ {
+  "page": 21,
+  "side": "右",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 22,
+  "side": "左",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 23,
+  "side": "右",
+  "layout": "pair",
+  "status": "双图位：原图未取得"
+ },
+ {
+  "page": 24,
+  "side": "左",
+  "layout": "screenshot",
+  "status": "聊天截图位：原图未取得，需以实际尺寸检查字迹"
+ },
+ {
+  "page": 25,
+  "side": "右",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 26,
+  "side": "左",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 27,
+  "side": "右",
+  "layout": "mixed",
+  "status": "照片 + 正文位：原图与原稿未取得"
+ },
+ {
+  "page": 28,
+  "side": "左",
+  "layout": "chapter",
+  "status": "篇章页提案：圆窗随时间变化；若原稿不分章则改为正文或照片页"
+ },
+ {
+  "page": 29,
+  "side": "右",
+  "layout": "text_first",
+  "status": "篇章首页正文位：原稿未取得"
+ },
+ {
+  "page": 30,
+  "side": "左",
+  "layout": "fullbleed",
+  "status": "满版出血照片位：原图未取得"
+ },
+ {
+  "page": 31,
+  "side": "右",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 32,
+  "side": "左",
+  "layout": "pair",
+  "status": "双图位：原图未取得"
+ },
+ {
+  "page": 33,
+  "side": "右",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 34,
+  "side": "左",
+  "layout": "screenshot",
+  "status": "聊天截图位：原图未取得，需以实际尺寸检查字迹"
+ },
+ {
+  "page": 35,
+  "side": "右",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 36,
+  "side": "左",
+  "layout": "plate",
+  "status": "单幅照片位：原图未取得"
+ },
+ {
+  "page": 37,
+  "side": "右",
+  "layout": "text",
+  "status": "正文位：原稿未取得，灰条仅示意版面密度"
+ },
+ {
+  "page": 38,
+  "side": "左",
+  "layout": "letter",
+  "status": "生日信：原信未取得；整页保留，不代写，不删节"
+ },
+ {
+  "page": 39,
+  "side": "右",
+  "layout": "afterword",
+  "status": "后记：本轮新拟版本（非历史原稿），ChatGPT署名，12pt/21pt"
+ },
+ {
+  "page": 40,
+  "side": "左",
+  "layout": "night",
+  "status": "星空网站二维码占位32mm：没有最终链接，不可扫描；星点仅装饰"
+ }
+]

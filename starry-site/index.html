@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="%LANG%">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- noindex 只减少搜索引擎收录，不是隐私保护：知道链接的人仍然可以打开页面 -->
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="theme-color" content="#17243A" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="referrer" content="no-referrer" />
+    <title>%PAGE_TITLE%</title>
+    <meta name="description" content="%PAGE_DESC%" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <!--FONT_FACES-->
+  </head>
+  <body>
+    <canvas id="sky-canvas" aria-hidden="true"></canvas>
+    <div class="static-stars" aria-hidden="true"></div>
+
+    <main id="app">
+      <section id="scene-intro" class="scene scene-intro is-active" aria-labelledby="intro-title">
+        <div class="moon" aria-hidden="true"></div>
+        <div class="intro-inner">
+          <h1 id="intro-title" class="intro-title" tabindex="-1">%INTRO_TITLE_HTML%</h1>
+          <p class="intro-sub">%INTRO_SUB%</p>
+          <a class="btn btn-primary" href="#/sky" id="enter-btn">%INTRO_ENTER%</a>
+        </div>
+        <svg class="hills" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 78 C40 60 70 66 104 54 C140 41 170 58 204 50 C240 41 268 30 304 44 C336 56 366 48 400 40 L400 120 L0 120 Z" fill="#132036" />
+          <path d="M0 96 C46 84 84 92 126 80 C170 68 206 88 250 82 C292 76 330 64 372 74 C386 77 394 80 400 80 L400 120 L0 120 Z" fill="#0E1828" />
+        </svg>
+      </section>
+      <section id="scene-sky" class="scene scene-sky" aria-labelledby="sky-heading" hidden></section>
+      <section id="scene-birthday" class="scene scene-birthday" aria-labelledby="birthday-heading" hidden></section>
+      <section id="scene-end" class="scene scene-end" aria-labelledby="end-heading" hidden></section>
+    </main>
+
+    <div id="card-layer" class="card-layer" hidden></div>
+
+    <noscript>
+      <style>.scene-intro .btn{display:none}</style>
+      <!--NOSCRIPT_STORY-->
+    </noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

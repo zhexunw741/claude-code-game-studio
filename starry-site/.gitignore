@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dist-*/
+*.zip
+
+# 私人内容：真实故事文案、由它生成的字体子集、文案清单、测试截图，一律不进公开仓库
+content/story.private.json
+content/*.private.*
+public/fonts/generated/
+STORY_CONTENT.md
+test-output/
+private/

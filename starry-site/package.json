@@ -12,7 +12,9 @@
     "build": "node scripts/check-content.mjs && node scripts/subset-fonts.mjs && tsc --noEmit && vite build",
     "preview": "vite preview --host",
     "story-doc": "node scripts/story-doc.mjs",
-    "test:e2e": "node tests/e2e.cjs"
+    "test:e2e": "node tests/e2e.cjs",
+    "test:verify": "node tests/verify-deploy.test.mjs",
+    "verify:deploy": "node scripts/verify-deploy.mjs"
   },
   "devDependencies": {
     "subset-font": "2.9.0",

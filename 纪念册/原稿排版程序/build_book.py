@@ -402,6 +402,17 @@ def main():
     base = Path(a.out) / IMG_DIR
     sizes = {k: Image.open(base / v).size for k, v in IMG.items()}
     pages = {p['page']: p for p in doc['pages']}
+    # 作者确认的文字订正（私有配置 corrections）：每条必须恰好命中一处，否则中止，避免误改
+    for r in cfg.get('corrections', []):
+        pg = pages[int(r['page'])]
+        fields = [('title', None)] + [('paragraphs', i) for i in range(len(pg['paragraphs']))]
+        hits = [(f, i) for f, i in fields if (pg[f] if i is None else pg[f][i]) == r['from']]
+        assert len(hits) == 1, f"订正规则未唯一命中: P{r['page']} {r['from']!r} 命中 {len(hits)} 处"
+        f, i = hits[0]
+        if i is None:
+            pg[f] = r['to']
+        else:
+            pg[f][i] = r['to']
     assert sorted(pages) == list(range(1, 41))
 
     # 章名：用于右页页眉与目录页码（P39 改排后记后，"尾声"从 P40 开始）

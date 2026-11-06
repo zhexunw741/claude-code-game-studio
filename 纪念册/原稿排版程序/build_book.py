@@ -67,6 +67,11 @@ def cropped(img, crop, w_mm, natural):
             f'left:{-x0 * scale:.2f}mm;top:{-y0 * scale:.2f}mm"></div>', h_mm)
 
 
+ICON_SLOT = ('<svg aria-hidden="true" width="7mm" height="5.4mm" viewBox="0 0 34 26" fill="none" stroke="#5E7282" stroke-width="1">'
+             '<rect x="0.5" y="0.5" width="33" height="25" rx="1"/><path d="M3 21 L12 12 L18 17 L23 12 L31 20"/>'
+             '<circle cx="24" cy="7" r="2.5"/></svg>')
+
+
 def chapter_block(ch):
     return ('<div class="chap">'
             f'<span class="chap-label">{E(ch["label"])}</span>'
@@ -155,10 +160,13 @@ def p_text(pg, side, sizes, chap_name):
     head = chapter_block(pg['chapter']) if has_ch else ''
     pl = PLACEMENTS.get(pg['page'])
     img_html = ''
-    if pl:
+    if pl and pl.get('img'):
         h, hmm = cropped(pl['img'], pl['crop'], pl['w'], sizes[pl['img']])
-        cap = (f'<div class="cap-in"><span class="cap-tx">{E(pl["cap"])}</span></div>' if pl['cap'] else '')
+        cap = (f'<div class="cap-in"><span class="cap-tx">{E(pl["cap"])}</span></div>' if pl.get('cap') else '')
         img_html = f'<div class="fig" style="width:{pl["w"]}mm">{h}{cap}</div>'
+    elif pl:   # 预留图位：原图未到，只排占位框（不放任何替代图片）
+        img_html = (f'<div class="fig" style="width:{pl["w"]}mm"><div class="slot" style="width:{pl["w"]}mm;height:{pl["h"]}mm">'
+                    f'{ICON_SLOT}<div>{E(pl.get("label", "照片位"))}</div><div class="slot-sub">待补原图</div></div></div>')
     body = paras(pg['paragraphs'])
     if pg['page'] in END_MARKS:
         body += f'<div class="endmark">{diamond(1.3)}</div>'
@@ -200,24 +208,40 @@ def p_letter(pg, side, sizes):
 
 
 def p_afterword(pg, side, sizes):
-    """P39 特别后记：已确认的 ChatGPT 署名版本。原文未提供时只排标题与占位，不代写。"""
+    """P39 特别后记：已确认的 ChatGPT 署名版本，逐字排入。原文未提供时只排标题与占位，不代写。
+
+    原文标记：**…** 为强调句（排中等字重）；以 "——" 开头为署名行；*…* 为落款行。标记符号本身不排出。
+    """
     x = tb_left(side)
     ps = P39CFG.get('paragraphs')
+    size, lead = P39CFG.get('size', SIZE), P39CFG.get('lead', LEAD)
+    style = f'font-size:{size}pt;line-height:{lead}pt'
+    out = []
     if ps:
-        body = ''.join(f'<p class="body{" noindent" if i == 0 else ""}" style="margin-bottom:1.4mm">{E(p)}</p>'
-                       for i, p in enumerate(ps))
+        for p in ps:
+            if p.startswith('**') and p.endswith('**') and len(p) > 4:
+                out.append(f'<p class="body" style="{style}"><strong class="aw-strong">{E(p[2:-2])}</strong></p>')
+            elif p.startswith('——'):
+                out.append(f'<div class="aw-sign" style="font-size:{size}pt">{E(p)}</div>')
+            elif p.startswith('*') and p.endswith('*') and len(p) > 2:
+                out.append(f'<div class="aw-date">{E(p[1:-1])}</div>')
+            else:
+                out.append(f'<p class="body" style="{style}">{E(p)}</p>')
+        body = ''.join(out)
     else:
         body = ('<div class="pending">〔已确认的特别后记原文待放入〕<br>'
                 '<span>本页按原后记排版，不使用新拟稿；收到原文后替换此处。</span></div>')
-    return (f'<div class="win" style="left:{x + TB_W - 28}mm;top:16mm;width:28mm;height:28mm">'
-            f'<img src="{DECO_DIR}/window_twilight.jpg" alt="" style="width:23.5mm;height:23.5mm"></div>'
-            f'<div class="tb flow" style="left:{x}mm;top:22mm;height:{BOTTOM - 22}mm" data-page="{pg["page"]}">'
-            f'<div style="font-size:8.5pt;letter-spacing:.5em;color:{GOLD_DEEP};margin-bottom:2.5mm">{E(P39CFG.get("label", "后记"))}</div>'
-            f'<div style="font-size:16pt;font-weight:500;letter-spacing:.14em;margin-bottom:14mm">{E(P39CFG.get("title", ""))}</div>{body}'
-            '<div style="display:flex;justify-content:flex-end;align-items:center;gap:3mm;margin-top:6mm">'
-            f'<span style="width:6.4mm;height:.26mm;background:{GOLD};display:inline-block"></span>'
-            f'<span style="font-family:\'Cormorant Garamond\',serif;font-style:italic;font-size:13pt">{E(P39CFG.get("signature", ""))}</span></div></div>'
-            + folio(pg['page']))
+    head = ('<div class="chap">'
+            f'<span class="chap-label">{E(P39CFG.get("label", "后记"))}</span>'
+            f'<span class="chap-name">{E(P39CFG.get("title", ""))}</span></div>')
+    # 本页无页眉：文字区上移至 11mm、下至 159.5mm；栏宽可由配置 width 放宽（两侧边距各减同样宽度）
+    w = P39CFG.get('width', TB_W)
+    x -= (w - TB_W) / 2
+    top, bottom = 11.0, 159.5
+    return (f'<div class="win" style="left:{x + w - 13}mm;top:{top - 1.5}mm;width:13mm;height:13mm">'
+            f'<img src="{DECO_DIR}/window_twilight.jpg" alt="" style="width:10.8mm;height:10.8mm"></div>'
+            f'<div class="tb flow" style="left:{x:.1f}mm;top:{top}mm;width:{w}mm;height:{bottom - top}mm" data-page="{pg["page"]}">'
+            f'{head}{body}</div>' + folio(pg['page']))
 
 
 def p_night(pg, side, sizes):
@@ -309,6 +333,13 @@ p.night { margin: 0; font-size: %SIZE%pt; line-height: %LEAD%pt; text-align: jus
 p.night.close { text-indent: 0; text-align: center; color: #F4ECDD; letter-spacing: .12em }
 p.night.en { text-indent: 0; text-align: center; font-family: 'Cormorant Garamond', serif; letter-spacing: .32em; font-size: 9pt; color: %GOLDL%; margin-top: 2mm }
 .qr { width: 36mm; height: 36mm; margin: 6.5mm auto 5.5mm; border: .26mm solid %GOLDL%; display: flex; justify-content: center; align-items: center }
+.slot { box-sizing: border-box; background: #E2E9ED; border: 1.1mm solid #FFFDF8; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; gap: 1.2mm; font-size: 8.5pt; letter-spacing: .14em; color: #3F4C58;
+  box-shadow: 0 .3mm .6mm rgba(34,49,63,.10), 0 2.6mm 5.6mm -2.4mm rgba(34,49,63,.24) }
+.slot-sub { font-size: 7.5pt; letter-spacing: .06em; color: #4F5B66 }
+.aw-strong { font-weight: 500; letter-spacing: .02em }
+.aw-sign { text-align: right; margin-top: 3mm; font-family: 'Noto Serif SC', serif; letter-spacing: .04em }
+.aw-date { text-align: right; font-size: 8pt; letter-spacing: .1em; color: %MUTE%; margin-top: 1mm }
 .night-ch { position: absolute; top: 8.2mm; font-size: 7.5pt; letter-spacing: .3em; color: %GOLDL% }
 .pending { font-size: 9.5pt; line-height: 1.9; color: %MUTE%; border: .26mm dashed #CFC4AE; padding: 6mm 5mm; text-align: center }
 .pending span { font-size: 8pt }

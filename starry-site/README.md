@@ -120,9 +120,34 @@ npm run test:e2e                          # 另开一个终端运行
 
 结果见 [TEST_REPORT.md](TEST_REPORT.md)。
 
-## 部署
+## 离线单文件版（v1.0，当前的交付方式）
 
-见 [DEPLOY_GUIDE.md](DEPLOY_GUIDE.md)：平台对比、需要购买或开通的服务、费用、实名与备案、操作步骤。正式发布前需要你先确认平台和公开内容；只有地址真实可访问、并在手机上实测之后，才生成纪念册 P40 的二维码。
+礼物方案已改为**直接把一个 HTML 文件发给对方**：不部署、不买域名、不需要网络。CSS、JavaScript、字体子集和图标全部内嵌在这一个文件里，文件自带内容安全策略（CSP），浏览器会拒绝任何对外请求。
+
+```bash
+STORY_CONTENT=~/private/story.private.json node scripts/check-content.mjs
+STORY_CONTENT=~/private/story.private.json node scripts/subset-fonts.mjs
+STORY_CONTENT=~/private/story.private.json OFFLINE=1 npx vite build --outDir ~/private/dist-offline --emptyOutDir
+DIST=~/private/dist-offline OUT_FILE=~/private/星空.html npm run build:offline
+OFFLINE_HTML=~/private/星空.html STORY_CONTENT=~/private/story.private.json OUT=~/private/test-output-offline npm run test:offline
+```
+
+- 交互版需要能运行 JavaScript 的浏览器：安卓 Chrome、系统浏览器，或电脑浏览器。
+- iPhone 的"文件"App 和微信的文件预览一般**不运行脚本**。这时页面自动显示只用 HTML/CSS 的**静态版**：
+  - 文案相同，点星星可以展开；
+  - 生日页有"点亮"按钮，结尾有流星动画；
+  - 没有星空连线和星轨动画。
+- `tests/offline.cjs` 用 `file://` 直接打开文件测试，覆盖：
+  - 断网打开，全程不得有网络请求、CSP 拦截或脚本错误；
+  - 每张卡片的文字与文案文件逐字一致，安卓返回键能关闭卡片；
+  - 不运行脚本时的静态版；
+  - 浏览器禁止存储时、系统开启"减少动画"时。
+- `tests/e2e.cjs` 也可以直接对本地文件运行：`BASE_URL=file:///…/星空.html`。
+- 生成的 HTML 含真实文案：只保存在仓库之外，并通过私下渠道发送。
+
+## 部署（已取消）
+
+2026-11-06 起取消云部署、域名、备案、HTTPS 和二维码计划，纪念册 P40 也不再放二维码。[DEPLOY_GUIDE.md](DEPLOY_GUIDE.md) 与下面的校验脚本仅作存档。
 
 部署后用校验脚本检查线上地址（只发 GET 请求，不需要任何账号）：
 
@@ -134,11 +159,11 @@ npm run test:verify                                              # 校验脚本�
 
 ## 版本
 
-版本号写在 `package.json` 的 `version` 字段。当前 `0.1.0`：首个可运行版本，未部署。
+版本号写在 `package.json` 的 `version` 字段。当前 `1.0.0`：离线单文件版；`0.1.0` 是首个可运行的网站版本，从未部署。
 
 ## 常见问题
 
 - **字体看起来不是宋体**：找不到源字体时，会跳过字体子集生成，退回系统字体。源字体默认取仓库 `纪念册/字体/`，也可以用 `FONT_SRC_DIR` 指定。改了文案要重新 `npm run build`，新字才会进入子集。
 - **手机打不开开发地址**：确认手机和电脑在同一网络，并且电脑防火墙允许该端口。
 - **想重新从 0 颗星开始**：点击结尾的"再看一次"。点亮状态只保存在当前浏览器标签页（sessionStorage）里，关闭标签页也会清空。
-- **微信里打不开或出现提示**：与部署的域名有关，见 DEPLOY_GUIDE.md 中"中国大陆与微信访问"一节。
+- **微信里打不开或出现提示**：与部署的域名有关，离线版不经过网络。微信里点开文件后若无法显示，请"用其他应用打开"并选浏览器；iPhone 上会显示静态版。

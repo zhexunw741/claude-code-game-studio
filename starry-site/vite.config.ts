@@ -23,20 +23,30 @@ function storyHtml(): Plugin {
       const title = t(s.intro.title);
       const [l1, l2] = title.includes('，') ? [title.slice(0, title.indexOf('，') + 1), title.slice(title.indexOf('，') + 1)] : [title, ''];
       const titleHtml = `<span class="line">${esc(l1)}</span>${l2 ? `<span class="line">${esc(l2)}</span>` : ''}`;
-      const stars = s.stars
-        .map(
-          (st: any) =>
-            `<article><h2>${esc(t(st.title))}</h2><p class="ns-date">${esc(st.date)}${st.place ? ' · ' + esc(t(st.place)) : ''}</p>` +
-            st.paras.map((p: Txt) => `<p>${esc(t(p))}</p>`).join('') +
-            '</article>',
-        )
-        .join('');
+      const paras = (ps: Txt[]) => ps.map((p) => `<p>${esc(t(p))}</p>`).join('');
+      // 无脚本版本（例如 iPhone"文件"或微信里的文件预览不运行 JavaScript）：
+      // 只用 HTML 与 CSS——<details> 点开星星、点亮按钮、结尾的流星动画——文案与时间线与交互版相同。
+      // 区块 id 与交互版路由同名（"/sky" 等），开场按钮 href="#/sky" 在无脚本时就跳到这里。
+      const starItem = (st: any) =>
+        `<li><details class="ns-star"><summary><span class="ns-dot" aria-hidden="true"></span>` +
+        `<span class="ns-lab"><span class="ns-title">${esc(t(st.title))}</span><span class="ns-date">${esc(st.date)}</span></span></summary>` +
+        `<div class="ns-body">${st.place ? `<p class="ns-place">${esc(t(st.place))}</p>` : ''}${paras(st.paras)}</div></details></li>`;
       const b = s.birthday;
       const e = s.ending;
       const noscript =
-        `<div class="noscript-story"><h1>${esc(title)}</h1>${stars}` +
-        `<article><h2>${esc(t(b.heading))}</h2><p>${esc(t(b.hero))}</p>${b.paras.map((p: Txt) => `<p>${esc(t(p))}</p>`).join('')}<p>${esc(t(b.lightDone))}</p></article>` +
-        `<article><h2>${esc(t(e.title))}</h2><p>${esc(t(e.sub))}</p><p>${esc(t(e.footer))}</p></article></div>`;
+        `<div class="ns">` +
+        `<section class="ns-sec ns-sky" id="/sky"><h2 class="ns-h">${esc(s.sky.heading)}</h2><p class="ns-hint">${esc(t(s.sky.hint))}</p>` +
+        `<ol class="ns-stars">${s.stars.map(starItem).join('')}</ol>` +
+        `<details class="ns-star ns-egg"><summary><span class="ns-dot" aria-hidden="true"></span><span class="ns-lab"><span class="ns-title">${esc(s.egg.label)}</span></span></summary>` +
+        `<div class="ns-body">${paras(s.egg.paras)}</div></details></section>` +
+        `<section class="ns-sec ns-bday" id="/birthday"><p class="eyebrow">${esc(b.date)}</p><h2 class="scene-title">${esc(t(b.heading))}</h2>` +
+        `<div class="bday-hero"><p>${esc(t(b.hero))}</p></div><div class="bday-body">${paras(b.paras)}</div>` +
+        `<details class="ns-light"><summary class="btn btn-primary">${esc(b.lightButton)}</summary>` +
+        `<span class="ns-halo" aria-hidden="true"></span><p class="bday-final ns-final">${esc(t(b.lightDone))}</p></details></section>` +
+        `<section class="ns-sec ns-end" id="/end"><span class="ns-shoot" aria-hidden="true"></span><span class="ns-shoot ns-shoot2" aria-hidden="true"></span>` +
+        `<h2 class="end-title">${esc(t(e.title))}</h2><p class="end-sub">${esc(t(e.sub))}</p>` +
+        `<p class="end-book">${esc(t(e.bookRef))}</p><p class="ns-foot">${esc(t(e.footer))}</p></section>` +
+        `</div>`;
       const fontDir = path.join(projectRoot, 'public', 'fonts', 'generated');
       const hasFont = fs.existsSync(path.join(fontDir, 'serif-400.woff2'));
       const fontCss = hasFont
@@ -64,6 +74,13 @@ export default defineConfig({
   base: './',
   resolve: { alias: { '@story': storyPath } },
   plugins: [storyHtml()],
-  build: { target: 'es2018', cssTarget: 'safari13', assetsInlineLimit: 0, sourcemap: false },
+  build: {
+    target: 'es2018',
+    cssTarget: 'safari13',
+    assetsInlineLimit: 0,
+    sourcemap: false,
+    // 离线单文件版（OFFLINE=1）只有一个内联脚本，不需要 modulepreload 兼容代码
+    modulePreload: process.env.OFFLINE === '1' ? false : { polyfill: true },
+  },
   server: { host: true },
 });

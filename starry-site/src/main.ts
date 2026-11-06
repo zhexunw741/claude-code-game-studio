@@ -18,6 +18,11 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Attrs = {}, ..
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector(sel) as T;
 const paras = (list: Txt[], cls = '') => list.map((p) => el('p', { class: cls || undefined, text: txt(p) }));
 const fmt = (tpl: string, vars: Record<string, string | number>) => tpl.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ''));
+/** 清空后放入子节点。等同 replaceChildren，但兼容 Chrome 86 / Safari 14 以前的浏览器与旧版安卓 WebView。 */
+const setChildren = (parent: Element, ...nodes: Node[]) => {
+  while (parent.firstChild) parent.removeChild(parent.firstChild);
+  nodes.forEach((n) => parent.appendChild(n));
+};
 
 /* ---------------------------------------------------------------- 已点亮状态（只存在本次会话） */
 const LIT_KEY = 'starry:lit';
@@ -126,7 +131,7 @@ function renderLit() {
     b.setAttribute('aria-label', `${i + 1}/${total} ${txt(s.title)}，${s.date}${on ? '，' + story.card.litBadge : ''}`);
   });
   // 连线：相邻两颗都点亮时才画
-  lines.replaceChildren();
+  setChildren(lines);
   for (let i = 0; i < total - 1; i++) {
     if (!(lit.has(i) && lit.has(i + 1))) continue;
     const a = story.stars[i];
@@ -196,7 +201,7 @@ function openCard(kind: 'star' | 'egg', index = 0) {
   );
   const backdrop = el('div', { class: 'card-backdrop', 'aria-hidden': 'true' });
   backdrop.addEventListener('click', closeCard);
-  layer.replaceChildren(backdrop, card);
+  setChildren(layer, backdrop, card);
   if (layer.hidden) lastFocus = (document.activeElement as HTMLElement) || null;
   layer.hidden = false;
   app.setAttribute('inert', '');
@@ -215,7 +220,7 @@ function hideCard() {
   if (layer.hidden) return;
   layer.classList.remove('is-open');
   layer.hidden = true;
-  layer.replaceChildren();
+  setChildren(layer);
   app.removeAttribute('inert');
   app.removeAttribute('aria-hidden');
 }

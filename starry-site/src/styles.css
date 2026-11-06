@@ -220,12 +220,81 @@ h1:focus-visible, h2:focus-visible { outline: none; }
 .end-book { margin-top: 18px; color: var(--gold-light); font-size: 14px; letter-spacing: .14em; }
 .end-foot { position: absolute; left: 0; right: 0; bottom: calc(var(--safe-b) + 18px); color: var(--gold); font-size: 12px; letter-spacing: .42em; }
 
-/* ---------------------------------------------------------------- 无脚本降级 */
-.noscript-story { position: relative; z-index: 2; max-width: 34rem; margin: 0 auto; padding: 24px 22px 60px; }
-.noscript-story h1 { font-size: 24px; font-weight: 500; letter-spacing: .12em; }
-.noscript-story h2 { margin: 28px 0 4px; font-size: 19px; font-weight: 500; color: var(--gold-light); }
-.noscript-story .ns-date { color: var(--gold); font-size: 13px; }
-.noscript-story p { margin: 0 0 .7em; line-height: 1.9; }
+/* ---------------------------------------------------------------- 无脚本版本（只在 <noscript> 生效时出现） */
+.ns { position: relative; z-index: 2; }
+.ns-sec {
+  position: relative; max-width: 32rem; margin: 0 auto;
+  padding: calc(var(--safe-t) + 56px) calc(var(--safe-r) + 22px) 56px calc(var(--safe-l) + 22px);
+}
+.ns-h { margin: 0; text-align: center; font-weight: 500; font-size: 24px; letter-spacing: .16em; }
+.ns-hint { margin-top: 6px; text-align: center; color: var(--muted); font-size: 14px; letter-spacing: .12em; }
+.ns-stars { position: relative; list-style: none; margin: 30px 0 0; padding: 0; }
+.ns-stars::before {   /* 连接六颗星的星座线 */
+  content: ''; position: absolute; left: 23.5px; top: 24px; bottom: 24px; width: 0;
+  border-left: 1px dashed rgba(197, 167, 122, .5);
+}
+.ns-star summary {
+  position: relative; display: flex; align-items: center; gap: 10px; min-height: 56px;
+  list-style: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.ns-star summary::-webkit-details-marker { display: none; }
+.ns-dot { position: relative; flex: none; width: 48px; height: 48px; }
+.ns-dot::before, .ns-dot::after { content: ''; position: absolute; left: 50%; top: 50%; border-radius: 50%; }
+.ns-dot::before {
+  width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; background: var(--cream);
+  box-shadow: 0 0 6px 2px rgba(247, 242, 233, .55), 0 0 18px 6px rgba(197, 167, 122, .25);
+  animation: invite 3.2s ease-in-out infinite;
+}
+.ns-dot::after { width: 30px; height: 30px; margin: -15px 0 0 -15px; border: 1px solid transparent; transform: scale(.6); transition: transform .6s ease, border-color .6s ease; }
+.ns-star[open] .ns-dot::before {
+  width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px; background: #fff6df; animation: none;
+  box-shadow: 0 0 8px 3px rgba(255, 240, 210, .75), 0 0 26px 10px rgba(197, 167, 122, .38);
+}
+.ns-star[open] .ns-dot::after { border-color: rgba(226, 201, 152, .75); transform: scale(1); }
+.ns-lab { display: flex; flex-direction: column; line-height: 1.4; }
+.ns-title { font-size: 16px; letter-spacing: .06em; }
+.ns-date { font-size: 12px; letter-spacing: .1em; color: var(--gold-light); font-variant-numeric: lining-nums; }
+.ns-body {
+  margin: 4px 0 14px 58px; padding: 16px 18px 6px; border: 1px solid rgba(197, 167, 122, .35); border-radius: 14px;
+  background: linear-gradient(180deg, rgba(29, 45, 72, .92), rgba(21, 34, 58, .92));
+  animation: ns-open .5s ease both;
+}
+@keyframes ns-open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.ns-body p { margin: 0 0 .85em; font-size: 16px; line-height: 1.95; color: var(--cream-warm); }
+.ns-body .ns-place { color: var(--gold-light); font-size: 13px; letter-spacing: .14em; }
+.ns-egg { margin-top: 18px; }
+.ns-egg .ns-dot::before { width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; background: #ebd7ae; animation: egg 4.6s ease-in-out infinite; }
+.ns-egg .ns-title { font-size: 14px; color: var(--muted); }
+
+.ns-bday { text-align: left; }
+.ns-light { position: relative; margin-top: 26px; text-align: center; }
+.ns-light summary { list-style: none; display: inline-flex; }
+.ns-light summary::-webkit-details-marker { display: none; }
+.ns-light[open] summary { display: none; }
+.ns-halo {
+  position: absolute; left: 50%; top: 50%; width: 280px; height: 160px; margin: -80px 0 0 -140px; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(226, 201, 152, .35), rgba(197, 167, 122, 0)); animation: ns-halo 2.4s ease both;
+}
+@keyframes ns-halo { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+.ns-final { position: relative; text-align: center; color: #fff4dc; text-shadow: 0 0 18px rgba(226, 201, 152, .8); animation: ns-final 2.4s ease both; }
+@keyframes ns-final { from { opacity: 0; letter-spacing: .5em; } to { opacity: 1; letter-spacing: .2em; } }
+
+.ns-end { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; text-align: center; overflow: hidden; }
+.ns-end .end-title { animation: ns-breathe 5s ease-in-out infinite; }
+@keyframes ns-breathe { 0%, 100% { text-shadow: 0 0 22px rgba(197, 167, 122, .2); } 50% { text-shadow: 0 0 34px rgba(226, 201, 152, .55); } }
+.ns-foot { margin-top: 44px; color: var(--gold); font-size: 12px; letter-spacing: .42em; }
+.ns-shoot {   /* 结尾的流星：纯 CSS，循环划过 */
+  position: absolute; left: 70%; top: 16%; width: 120px; height: 1.5px; border-radius: 1px; pointer-events: none;
+  background: linear-gradient(90deg, rgba(255, 246, 223, .95), rgba(255, 246, 223, 0));   /* 亮头在左：流星朝左下方划过 */
+  transform: rotate(-24deg); opacity: 0; animation: ns-shoot 7s ease-in 1.2s infinite;
+}
+.ns-shoot2 { left: 30%; top: 30%; width: 90px; animation-delay: 4.6s; animation-duration: 9s; }
+@keyframes ns-shoot {
+  0% { opacity: 0; transform: translate(0, 0) rotate(-24deg); }
+  4% { opacity: 1; }
+  12% { opacity: 0; transform: translate(-180px, 80px) rotate(-24deg); }
+  100% { opacity: 0; transform: translate(-180px, 80px) rotate(-24deg); }
+}
 
 /* ---------------------------------------------------------------- 小屏、横屏 */
 @media (max-height: 520px) and (orientation: landscape) {

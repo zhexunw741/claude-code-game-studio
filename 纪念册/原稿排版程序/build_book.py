@@ -245,11 +245,62 @@ def p_afterword(pg, side, sizes):
             f'{head}{body}</div>' + folio(pg['page']))
 
 
+END_MARK = '[收尾]'   # 替换稿中的分隔行：之后的句子作为页面下部居中的收尾段
+
+
+def night_sky():
+    """P40 星空：右上角星月 + 散布在留白处的细小星点（位置固定，可重复生成）。"""
+    import random
+    rnd = random.Random(40)
+    dots = []
+    for _ in range(46):
+        x, y = rnd.uniform(4, 121), rnd.uniform(4, 142)
+        if 9 <= x <= 116 and 12 <= y <= 92:      # 避开正文区，星点只落在四周与收尾段周围的留白
+            continue
+        r = rnd.choice((.16, .2, .24, .3))
+        dots.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r}" opacity="{rnd.uniform(.25, .7):.2f}"/>')
+    return ('<svg aria-hidden="true" style="position:absolute;left:0;top:0" width="125mm" height="176mm" viewBox="0 0 125 176">'
+            f'<g fill="#E3D2A6">{"".join(dots)}</g></svg>')
+
+
+def p_ending(pg, side, paras):
+    """P40（v6 起）：独立的文学收尾页。上部为正文，下部为居中的收尾句，不含二维码或网址。"""
+    x = tb_left(side)
+    i = paras.index(END_MARK)
+    body, close = paras[:i], paras[i + 1:]
+    body_html = ''.join(f'<p class="night ending">{E(p)}</p>' for p in body)
+    zh = [p for p in close if not p.isascii()]
+    en = [p for p in close if p.isascii()]
+    close_html = ''.join(
+        f'<p class="end-line{" end-key" if k == len(zh) - 1 else ""}">{E(p)}</p>' for k, p in enumerate(zh))
+    close_html += ''.join(f'<p class="night en end-en">{E(p)}</p>' for p in en)
+    divider = ('<div class="end-div"><span class="end-rule"></span>'
+               '<svg width="3.2mm" height="3.2mm" viewBox="0 0 10 10" aria-hidden="true">'
+               '<path d="M5 0 L5.9 4.1 L10 5 L5.9 5.9 L5 10 L4.1 5.9 L0 5 L4.1 4.1 Z" fill="#CDB98A"/></svg>'
+               '<span class="end-rule"></span></div>')
+    stars = ('<svg aria-hidden="true" style="position:absolute;right:8mm;top:2.5mm" width="30mm" height="10mm" viewBox="0 0 128 43">'
+             '<g fill="#E3D2A6"><circle cx="8" cy="30" r="0.9" opacity=".7"/><circle cx="40" cy="10" r="0.7" opacity=".8"/>'
+             '<circle cx="74" cy="34" r="0.6" opacity=".6"/><circle cx="60" cy="18" r="0.8" opacity=".7"/>'
+             '<path d="M26 16 L27 20 L31 21 L27 22 L26 26 L25 22 L21 21 L25 20 Z" opacity=".8"/></g>'
+             f'<circle cx="108" cy="22" r="10" fill="#E3D2A6"/><circle cx="113" cy="18" r="9.2" fill="{NAVY}"/></svg>')
+    return (f'<div class="bleed" style="background:{NAVY}"></div>' + night_sky() + stars +
+            f'<img class="nightimg" src="{DECO_DIR}/night_whale.jpg" alt="">'
+            + (f'<div class="night-ch" style="left:{x}mm">{E(pg["chapter"]["label"])}　{E(pg["chapter"]["name"])}</div>' if pg['chapter'] else '') +
+            f'<div class="tb nightflow" style="left:{x}mm;top:15mm" data-page="{pg["page"]}">'
+            f'<div class="ptitle night-t"><span class="tick"></span>{E(pg["title"])}</div>{body_html}</div>'
+            f'<div class="end-block">{divider}{close_html}</div>'
+            + folio(pg['page'], GOLD_LIGHT))
+
+
 def p_night(pg, side, sizes):
-    """P40：原稿文字 + 星空 + 二维码占位（链接确认前不可扫描）。"""
+    """P40：原稿文字 + 星空。替换稿含收尾分隔行时排成独立收尾页（v6）；
+    旧版替换稿含二维码标记时排二维码占位（链接确认前不可扫描）。"""
+    paras = OVERRIDES.get(pg['page'], pg['paragraphs'])
+    if END_MARK in paras:
+        return p_ending(pg, side, paras)
     x = tb_left(side)
     parts, after_qr = [], False
-    for p in OVERRIDES.get(pg['page'], pg['paragraphs']):
+    for p in paras:
         if p.startswith('[') and '二维码' in p:
             parts.append('<div class="qr"><div class="qr-in"><div>二维码位置</div><div>链接确认后生成</div></div></div>')
             after_qr = True
@@ -333,6 +384,13 @@ p.letter.salute { text-indent: 0; margin-bottom: .6mm }
 p.night { margin: 0; font-size: %SIZE%pt; line-height: %LEAD%pt; text-align: justify; text-indent: 2em }
 p.night.close { text-indent: 0; text-align: center; color: #F4ECDD; letter-spacing: .12em }
 p.night.en { text-indent: 0; text-align: center; font-family: 'Cormorant Garamond', serif; letter-spacing: .32em; font-size: 9pt; color: %GOLDL%; margin-top: 2mm }
+p.night.ending { line-height: 17.5pt; margin-bottom: 1.6mm; text-wrap: pretty }
+.end-block { position: absolute; left: 0; width: 125mm; top: 101mm; text-align: center }
+.end-div { display: flex; justify-content: center; align-items: center; gap: 2.4mm; margin-bottom: 7.5mm }
+.end-rule { width: 9mm; height: .2mm; background: %GOLDL%; opacity: .55 }
+p.end-line { margin: 0; font-size: 10.5pt; line-height: 1.9; letter-spacing: .14em; padding-left: .14em; color: #E9E0CF }   /* 左补与字距相等，抵消末字后的字距，保持居中 */
+p.end-line.end-key { margin-top: 2.2mm; font-size: 13pt; font-weight: 500; letter-spacing: .16em; padding-left: .16em; color: #F4ECDD }
+p.night.en.end-en { margin-top: 6.5mm; font-size: 8.5pt; padding-left: .32em }
 .qr { width: 36mm; height: 36mm; margin: 6.5mm auto 5.5mm; border: .26mm solid %GOLDL%; display: flex; justify-content: center; align-items: center }
 .slot { box-sizing: border-box; background: #E2E9ED; border: 1.1mm solid #FFFDF8; display: flex; flex-direction: column;
   justify-content: center; align-items: center; gap: 1.2mm; font-size: 8.5pt; letter-spacing: .14em; color: #3F4C58;

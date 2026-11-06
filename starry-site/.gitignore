@@ -9,4 +9,6 @@ content/*.private.*
 public/fonts/generated/
 STORY_CONTENT.md
 test-output/
+test-output-*/
+*.offline.html
 private/

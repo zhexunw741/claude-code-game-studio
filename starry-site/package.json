@@ -1,8 +1,8 @@
 {
   "name": "starry-site",
   "private": true,
-  "version": "0.1.0",
-  "description": "纪念册 P40 的延伸：一页可在手机上浏览的互动星空（静态站点，无后端）",
+  "version": "1.0.0",
+  "description": "互动星空：可在手机上直接打开的单文件离线网页（无服务器、无网络请求）",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
@@ -13,6 +13,8 @@
     "preview": "vite preview --host",
     "story-doc": "node scripts/story-doc.mjs",
     "test:e2e": "node tests/e2e.cjs",
+    "test:offline": "node tests/offline.cjs",
+    "build:offline": "node scripts/build-offline.mjs",
     "test:verify": "node tests/verify-deploy.test.mjs",
     "verify:deploy": "node scripts/verify-deploy.mjs"
   },

@@ -278,8 +278,16 @@ async function perfSuite(browser) {
   const t0 = Date.now();
   await page.goto(BASE, { waitUntil: 'load' });
   const loadMs = Date.now() - t0;
-  const paint = await page.evaluate(() => Object.fromEntries(performance.getEntriesByType('paint').map((e) => [e.name, Math.round(e.startTime)])));
-  const fcp = paint['first-contentful-paint'];
+  // 等首次内容绘制记录出现再读：本地文件加载极快时，load 事件可能早于绘制记录写入（曾因此读到 undefined）
+  const fcp = await page.evaluate(() => new Promise((res) => {
+    const find = (list) => list.find((e) => e.name === 'first-contentful-paint');
+    const now = find(performance.getEntriesByType('paint'));
+    if (now) return res(Math.round(now.startTime));
+    try {
+      new PerformanceObserver((l) => { const e = find(l.getEntries()); if (e) res(Math.round(e.startTime)); }).observe({ type: 'paint', buffered: true });
+    } catch { /* 不支持时由下面的超时返回 */ }
+    setTimeout(() => res(undefined), 3000);
+  }));
   record(g, '首屏内容出现（FCP）', fcp !== undefined && fcp < 2500, `FCP ${fcp} ms；load ${loadMs} ms；4G 模拟 150ms 延迟、4Mbps、CPU 降速 4 倍`);
   await page.waitForTimeout(1500);
   record(g, '首次加载总传输量', bytes < 400 * 1024, `${(bytes / 1024).toFixed(1)} KB`);

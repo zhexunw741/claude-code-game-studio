@@ -56,12 +56,20 @@ def diamond(size=1.2):
     return f'<span class="dia" style="width:{size}mm;height:{size}mm"></span>'
 
 
+FRAME = 1.1   # 图片白边（mm），与 CSS .crop 的 border 一致
+
+
 def cropped(img, crop, w_mm, natural):
-    """按像素区域裁切图片，宽度 w_mm，返回 (html, 高度mm)。"""
+    """按像素区域裁切图片，外框宽度 w_mm（含白边），返回 (html, 外框高度mm)。
+
+    .crop 是 border-box：白边占在框内，图片相对白边内侧定位。
+    所以裁切区要缩放到白边以内的宽度，外框高度 = 裁切区高度 + 上下白边；
+    否则图片右侧和底部会各被白边多遮掉约 2mm（v7 之前的版本存在这个问题）。
+    """
     nw, nh = natural
     x0, y0, x1, y1 = crop or (0, 0, nw, nh)
-    scale = w_mm / (x1 - x0)                    # mm/px
-    h_mm = (y1 - y0) * scale
+    scale = (w_mm - 2 * FRAME) / (x1 - x0)      # mm/px
+    h_mm = (y1 - y0) * scale + 2 * FRAME
     return (f'<div class="crop" style="width:{w_mm:.2f}mm;height:{h_mm:.2f}mm">'
             f'<img src="{IMG_DIR}/{IMG[img]}" alt="" style="width:{nw * scale:.2f}mm;height:{nh * scale:.2f}mm;'
             f'left:{-x0 * scale:.2f}mm;top:{-y0 * scale:.2f}mm"></div>', h_mm)
